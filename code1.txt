@@ -1,0 +1,24 @@
+#数据整理
+library(tidyverse)
+library(limma)
+
+exp_693 = read.csv("CGGA.mRNAseq_693.RSEM-genes.20200506.txt",sep = "\t",header=T,check.names=FALSE)
+exp_325 = read.csv("CGGA.mRNAseq_325.RSEM-genes.20200506.txt",sep = "\t",header=T,check.names=FALSE)
+exp_lnc = inner_join(exp_325,exp_693,by = 'Gene_Name')
+exp_lnc = column_to_rownames(exp_lnc,var = 'Gene_Name')
+
+boxplot(exp_lnc,outline=FALSE,notch=T,las=2)  
+
+#读入sample_trait
+exp_lnc = exp_lnc[,c(colnames(exp_lnc) %in% sample_trait$CGGA_ID)]
+boxplot(exp_lnc,outline=FALSE,notch=T,las=2)
+temp = rownames_to_column(exp_lnc,var = 'gene')
+range(exp_lnc)
+#读入lnc
+lncRNA = lncRNA[,-1,drop = F]
+exp_lnc = rownames_to_column(exp_lnc,var = 'lncRNA')
+exp_lnc = inner_join(exp_lnc,lncRNA,by = 'lncRNA')
+exp_lnc = column_to_rownames(exp_lnc,var = 'lncRNA')
+boxplot(exp_lnc,outline=FALSE,notch=T,las=2)
+dev.off()
+range(exp_lnc)
